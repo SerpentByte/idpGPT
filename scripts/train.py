@@ -33,7 +33,8 @@ def parse_args():
     )
 
     # Data
-    p.add_argument("--tokenizer-path", type=str, required=True, help="Path to tokenizer YAML file")
+    p.add_argument("--tokenizer", type=str, required=True, dest="tokenizer_path", 
+                   help="Path to tokenizer YAML file")
     p.add_argument("--train-data", type=str, required=True, help="Path to training data pickle (RandomChunkLoader dataset)")
     p.add_argument("--val-data", type=str, required=True, help="Path to validation data pickle (RandomChunkLoader dataset)")
 
