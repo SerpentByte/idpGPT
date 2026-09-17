@@ -11,6 +11,7 @@ import argparse
 
 import torch
 import yaml
+from tqdm.auto import tqdm
 
 from idpgpt import decoderGPT, predict, saveFasta
 
@@ -23,8 +24,8 @@ def parse_args():
 
     p.add_argument("--weights", type=str, required=True,
                     help="Path to .pt file saved by train.py (state_dict + model_args + vocab_len)")
-    p.add_argument("--tokenizer", type=str, required=True, dest="tokenizer_path", 
-                   help="Path to tokenizer YAML file")
+    p.add_argument("--tokenizer", type=str, required=True, dest="tokenizer_path",
+                    help="Path to tokenizer YAML file")
 
     p.add_argument("--min-length", type=int, required=True, help="Minimum generated sequence length")
     p.add_argument("--max-length", type=int, required=True, help="Maximum generated sequence length")
@@ -60,28 +61,32 @@ def main():
     ckpt = torch.load(args.weights, map_location="cpu")
     model = decoderGPT(vocab_len=ckpt["vocab_len"], **ckpt["model_args"])
     model.load_state_dict(ckpt["state_dict"])
+    model.float()  # upcast in case weights were saved in fp16
     model.to(device)
     model.eval()
 
     context = args.context if args.context is not None else ckpt["model_args"]["max_len"]
 
-    # Generate in batches until we have n_sequences
+    # Generate in batches until we have n_sequences, tracked with an overall progress bar
     sequences = []
     remaining = args.n_sequences
-    while remaining > 0:
-        batch_size = min(args.batch_size, remaining)
-        batch = predict(
-            models=[model],
-            minLength=args.min_length,
-            maxLength=args.max_length,
-            tokenizer=tokenizer,
-            context=context,
-            batch_size=batch_size,
-            sampling=args.sampling,
-            T=args.temperature,
-        )
-        sequences.extend(batch)
-        remaining -= batch_size
+    with tqdm(total=args.n_sequences, desc="Generating sequences", unit="seq") as pbar:
+        while remaining > 0:
+            batch_size = min(args.batch_size, remaining)
+            batch = predict(
+                models=[model],
+                minLength=args.min_length,
+                maxLength=args.max_length,
+                tokenizer=tokenizer,
+                context=context,
+                batch_size=batch_size,
+                sampling=args.sampling,
+                T=args.temperature,
+                verbose=False,  # suppress predict()'s own per-token bar; we track sequence-level progress instead
+            )
+            sequences.extend(batch)
+            remaining -= batch_size
+            pbar.update(batch_size)
 
     saveFasta(sequences, args.output)
 
