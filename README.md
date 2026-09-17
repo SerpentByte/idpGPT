@@ -64,7 +64,7 @@ python scripts/train.py \
   --tokenizer-path models/tokenizer.yaml \
   --train-data data/llps_plus_train0.lod \
   --val-data data/llps_plus_val0.lod \
-  --nheads 8 --nlayers 8 --embed-dim 256 --ff-dim 1024 --max-len 128 \
+  --nheads 2 --nlayers 2 --embed-dim 1024 --ff-dim 2048 --max-len 128 \
   --best-weights-out models/llps_plus_weights.pt
 ```
 
