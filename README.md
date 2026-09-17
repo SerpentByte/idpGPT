@@ -68,7 +68,7 @@ python scripts/train.py \
 - **`scripts/generate.py`** — loads a trained `.pt` file and generates new
   sequences within a specified length range.
 
-An easier to use Google Colab is available \url[here]/{https://tinyurl.com/3kmy5xbt}
+An easier to use Google Colab is available [here](https://tinyurl.com/3kmy5xbt)
 
 ## Citation
 
