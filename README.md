@@ -61,7 +61,7 @@ To train a model from scratch:
 
 ```bash
 python scripts/train.py \
-  --tokenizer-path models/tokenizer.yaml \
+  --tokenizer models/tokenizer.yaml \
   --train-data data/llps_plus_train0.lod \
   --val-data data/llps_plus_val0.lod \
   --nheads 2 --nlayers 2 --embed-dim 1024 --ff-dim 2048 --max-len 128 \
@@ -80,7 +80,7 @@ them first:
 ```bash
 python scripts/fasta2loader.py \
   --fasta my_train.fa \
-  --tokenizer-path models/tokenizer.yaml \
+  --tokenizer models/tokenizer.yaml \
   --chunk-length 129 \
   --output my_train.lod
 ```
